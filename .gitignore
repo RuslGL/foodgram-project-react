@@ -130,3 +130,7 @@ dmypy.json
 
 # .idea
 .idea
+
+# my files/folders
+images/
+data/

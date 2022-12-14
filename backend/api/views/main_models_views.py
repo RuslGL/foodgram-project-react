@@ -1,5 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
+from rest_framework.permissions import AllowAny
+
 from recepies.models import Ingredients, Recipe, Tags
 
 from ..filters import CustomRecipeFilter
@@ -19,6 +21,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     pagination_class = None
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
+    permission_classes = [AllowAny, ]
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -30,6 +33,7 @@ class TagsViewSet(viewsets.ModelViewSet):
     serializer_class = TagsSerializer
     http_method_names = ['get']
     pagination_class = None
+    permission_classes = [AllowAny, ]
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

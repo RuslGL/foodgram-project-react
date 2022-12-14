@@ -1,24 +1,21 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recepies.models import Subscription
-from users.models import User
+from users.models import Subscription, User
+
+from ..serializers import SubscriptionsSerializer, ToSubscribeSerializer
 
 
-class SubscribeView(APIView):
-
-    permission_classes = [IsAuthenticated, ]
-
+class ToSubscribeView(APIView):
     def post(self, request, id):
         data = {
             'user': request.user.id,
             'author': id
         }
-        serializer = SubscriptionSerializer(
+        serializer = ToSubscribeSerializer(
             data=data,
             context={'request': request}
         )
@@ -39,15 +36,13 @@ class SubscribeView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class SubscriptionsView(ListAPIView):
-
-    permission_classes = [IsAuthenticated, ]
+class GetSubscriptionsView(ListAPIView):
 
     def get(self, request):
         user = request.user
         queryset = User.objects.filter(author__user=user)
         page = self.paginate_queryset(queryset)
-        serializer = ShowSubscriptionsSerializer(
+        serializer = SubscriptionsSerializer(
             page, many=True, context={'request': request}
         )
         return self.get_paginated_response(serializer.data)

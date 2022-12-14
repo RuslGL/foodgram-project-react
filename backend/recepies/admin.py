@@ -1,8 +1,9 @@
 from django.contrib import admin
 
+from users.models import Subscription, User
 
 from .models import Favorite, Ingredients, Recipe, ShoppingCart, Tags
-from users.models import User, Subscription
+
 
 @admin.register(Ingredients)
 class IngredientsAdmin(admin.ModelAdmin):
@@ -36,7 +37,8 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'username', 'password',)
+    list_display = ('email', 'first_name', 'last_name',
+                    'username', 'password',)
     empty_value_display: str = '-пусто-'
 
 
