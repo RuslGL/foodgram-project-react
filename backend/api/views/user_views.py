@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import ListAPIView
@@ -40,9 +41,11 @@ class GetSubscriptionsView(ListAPIView):
 
     def get(self, request):
         user = request.user
-        queryset = User.objects.filter(author__user=user)
+        queryset = User.objects.filter(
+            author__user=user).annotate(Count('recipes'))
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionsSerializer(
-            page, many=True, context={'request': request}
+            page, many=True,
+            context={'request': request, "queryset": queryset}
         )
         return self.get_paginated_response(serializer.data)

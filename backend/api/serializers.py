@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -97,7 +99,9 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             recipes, many=True, context={'request': request}).data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return self.context.get('queryset').values().first().get(
+            'recipes__count'
+            )
 
 
 class ToSubscribeSerializer(serializers.ModelSerializer):
@@ -187,6 +191,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ).exists()
 
 
+@transaction.atomic
 class CreateRecipeSerializer(serializers.ModelSerializer):
 
     author = UserSerializer(read_only=True)
@@ -218,46 +223,52 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                    'amount': 'Количество ингредиента не может быть равным 0'
                 })
-            if ingredient['id'] in list:
-                raise serializers.ValidationError({
-                   'ingredient': 'Ингредиенты не должны повторяться'
-                })
             list.append(ingredient['id'])
         return data
 
+    @transaction.atomic
     def create_ingredients(self, ingredients, recipe):
-        for item in ingredients:
-            ingredient = Ingredients.objects.get(id=item['id'])
-            RecipeIngredients.objects.create(
-                ingredient=ingredient, recipe=recipe, amount=item['amount']
+        objects = [
+            RecipeIngredients(
+                ingredient=Ingredients.objects.get(id=item['id']),
+                recipe=recipe,
+                amount=item['amount']
             )
+            for item in ingredients
+        ]
+        RecipeIngredients.objects.bulk_create(objects)
 
     def create_tags(self, tags, recipe):
-        for tag in tags:
-            RecipeTags.objects.create(recipe=recipe, tag=tag)
+        objects = [
+            RecipeTags(recipe=recipe, tag=tag)
+            for tag in tags
+        ]
+        RecipeTags.objects.bulk_create(objects)
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        author = self.context.get('request').user
-        recipe = Recipe.objects.create(author=author, **validated_data)
+        validated_data['author'] = self.context.get('request').user
+        recipe = super().create(validated_data)
+
         self.create_ingredients(ingredients, recipe)
         self.create_tags(tags, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
-        RecipeTags.objects.filter(recipe=instance).delete()
-        RecipeIngredients.objects.filter(recipe=instance).delete()
-        ingredients = validated_data.pop('ingredients')
+
         tags = validated_data.pop('tags')
-        self.create_ingredients(ingredients, instance)
-        self.create_tags(tags, instance)
-        instance.name = validated_data.pop('name')
-        instance.text = validated_data.pop('text')
-        if validated_data.get('image'):
-            instance.image = validated_data.pop('image')
-        instance.cooking_time = validated_data.pop('cooking_time')
-        instance.save()
+        ingredients = validated_data.pop('ingredients')
+
+        instance = super().update(instance, validated_data)
+        if tags:
+            instance.tags.clear()
+            instance.tags.set(tags)
+        if ingredients:
+            instance.ingredients.clear()
+            self.create_ingredients(ingredients, instance)
         return instance
 
     def to_representation(self, instance):

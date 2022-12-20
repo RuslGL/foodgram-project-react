@@ -11,10 +11,7 @@ from ..serializers import (CreateRecipeSerializer, IngredientsSerializer,
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
-    """
-    Получение списка всех ингридиентов.
-    Права доступа: all users.
-    """
+
     queryset = Ingredients.objects.all().order_by("id")
     serializer_class = IngredientsSerializer
     http_method_names = ['get']
@@ -25,10 +22,7 @@ class IngredientsViewSet(viewsets.ModelViewSet):
 
 
 class TagsViewSet(viewsets.ModelViewSet):
-    """
-    Получение списка всех тэгов.
-    Права доступа: all users.
-    """
+
     queryset = Tags.objects.all().order_by("id")
     serializer_class = TagsSerializer
     http_method_names = ['get']
