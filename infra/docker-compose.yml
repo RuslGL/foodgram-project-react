@@ -13,7 +13,7 @@ services:
       dockerfile: Dockerfile    
     volumes:
       - ../static/:/app/static/
-      - ../media/:/app/media/recepies/
+      - ../media/:/app/media//
     
     depends_on:
       - db
