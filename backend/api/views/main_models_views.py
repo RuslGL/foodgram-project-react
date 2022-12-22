@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 
 from recepies.models import Ingredients, Recipe, Tags
 
-from ..filters import CustomRecipeFilter
+from ..filters import CustomRecipeFilter, IngredientFilter
 from ..permissions import IsAuthorAdminOrReadOnly
 from ..serializers import (CreateRecipeSerializer, IngredientsSerializer,
                            RecipeSerializer, TagsSerializer)
@@ -16,8 +16,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientsSerializer
     http_method_names = ['get']
     pagination_class = None
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = [IngredientFilter, ]
+    search_fields = ['^name', ]
     permission_classes = [AllowAny, ]
 
 

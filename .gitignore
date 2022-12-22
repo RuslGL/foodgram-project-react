@@ -134,3 +134,7 @@ dmypy.json
 # my files/folders
 images/
 data/
+
+
+media/
+static/

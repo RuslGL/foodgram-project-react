@@ -1,5 +1,4 @@
 from django.db import transaction
-
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -54,8 +53,8 @@ class UserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
+        # if request is None or request.user.is_anonymous:
+        #    return False
         return Subscription.objects.filter(
             user=request.user, author=obj
         ).exists()
@@ -238,6 +237,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ]
         RecipeIngredients.objects.bulk_create(objects)
 
+    @transaction.atomic
     def create_tags(self, tags, recipe):
         objects = [
             RecipeTags(recipe=recipe, tag=tag)

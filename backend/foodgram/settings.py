@@ -42,9 +42,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # react
-#    'corsheaders.middleware.CorsMiddleware',
-#    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
@@ -148,13 +145,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-# react
-#CORS_ALLOWED_ORIGINS = [
-#    'http://localhost:3000',
-#]
-
-
-#CORS_ORIGIN_ALLOW_ALL = True
-#CORS_URLS_REGEX = r'^/api/.*$'
