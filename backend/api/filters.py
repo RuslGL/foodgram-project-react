@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filter
 from rest_framework.filters import SearchFilter
 
-from recepies.models import Recipe, Tags
+from recepies.models import Recipe
 
 
 class IngredientFilter(SearchFilter):
@@ -17,13 +17,8 @@ class CustomRecipeFilter(filter.FilterSet):
     is_in_shopping_cart = filter.BooleanFilter(
         method='is_in_shopping_cart')
 
-    tags = filter.AllValuesMultipleFilter(field_name='tags__slug')
-    #tags = filter.ModelMultipleChoiceFilter(
-    #    field_name='tags__slug',
-    #    queryset=Tags.objects.all(),
-    #    label='Tags',
-    #    to_field_name='slug'
-    #)
+    tags = filter.CharFilter(
+        field_name='tags__slug', lookup_expr='icontains')
 
     class Meta:
         model = Recipe
