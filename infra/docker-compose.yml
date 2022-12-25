@@ -8,9 +8,7 @@ services:
       - ./.env
 
   backend:
-    build:
-      context: ../backend/
-      dockerfile: Dockerfile    
+    image: ruslgl/foodgram:latest
     volumes:
       - ../static/:/app/static/
       - ../media/:/app/media/recepies/
