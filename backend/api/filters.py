@@ -10,26 +10,25 @@ class IngredientFilter(SearchFilter):
 
 class CustomRecipeFilter(filter.FilterSet):
 
-    is_favorited = filter.BooleanFilter(method='is_favorited')
-
-    author = filter.CharFilter()
-
-    is_in_shopping_cart = filter.BooleanFilter(
-        method='is_in_shopping_cart')
-
     tags = filter.CharFilter(
         field_name='tags__slug', lookup_expr='icontains')
+    is_favorited = filter.BooleanFilter(method='get_is_favorited')
+    is_in_shopping_cart = filter.BooleanFilter(
+        method='get_is_in_shopping_cart'
+    )
 
     class Meta:
         model = Recipe
-        fields = ['is_favorited', 'author', 'is_in_shopping_cart',  'tags', ]
+        fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
 
-    def is_favorited(self, queryset, name, value):
-        if value:
-            return queryset.filter(favorites__user=self.request.user)
+    def get_is_favorited(self, queryset, name, value):
+        user = self.request.user
+        if value and user.is_authenticated:
+            return queryset.filter(favorites__user=user)
         return queryset
 
-    def is_in_shopping_cart(self, queryset, name, value):
-        if value:
-            return queryset.filter(shopping_cart__user=self.request.user)
+    def get_is_in_shopping_cart(self, queryset, name, value):
+        user = self.request.user
+        if value and user.is_authenticated:
+            return queryset.filter(shopping_cart__user=user)
         return queryset
