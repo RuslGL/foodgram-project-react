@@ -20,10 +20,8 @@ services:
     restart: always
 
   frontend:
-    #image: ruslgl/frontend:v1
+    image: ruslgl/frontend:v1
     build:
-      context: ../frontend
-      dockerfile: Dockerfile
 
     volumes:
       - ../frontend/:/app/result_build/
