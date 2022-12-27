@@ -99,9 +99,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
             recipes, many=True, context={'request': request}).data
 
     def get_recipes_count(self, obj):
-        return self.context.get('queryset').values().first().get(
-            'recipes__count'
-            )
+        return Recipe.objects.filter(author=obj).count()
 
 
 class ToSubscribeSerializer(serializers.ModelSerializer):

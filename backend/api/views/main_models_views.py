@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from recepies.models import Ingredients, Recipe, Tags
 
 from ..filters import CustomRecipeFilter, IngredientFilter
+from ..paginator import CustomPagination
 from ..permissions import IsAuthorAdminOrReadOnly
 from ..serializers import (CreateRecipeSerializer, IngredientsSerializer,
                            RecipeSerializer, TagsSerializer)
@@ -15,7 +16,6 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredients.objects.all().order_by("id")
     serializer_class = IngredientsSerializer
     http_method_names = ['get']
-    pagination_class = None
     filter_backends = [IngredientFilter, ]
     search_fields = ['^name', ]
     permission_classes = [AllowAny, ]
@@ -36,6 +36,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthorAdminOrReadOnly, ]
     filter_backends = [DjangoFilterBackend, ]
     filterset_class = CustomRecipeFilter
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from recepies.models import Favorite, Recipe, RecipeIngredients, ShoppingCart
 
+from ..paginator import CustomPagination
 from ..serializers import FavoriteSerializer, ShoppingCartSerializer
 
 
@@ -67,6 +68,7 @@ def download_shopping_cart(request):
 
 
 class FavoriteView(APIView):
+    pagination_class = CustomPagination
 
     def post(self, request, id):
         data = {
